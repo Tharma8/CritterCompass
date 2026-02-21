@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Live | CritterCompass Recon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root { --neon-blue: #3b82f6; --neon-red: #ef4444; --neon-emerald: #10b981; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; overflow: hidden; height: 100vh; }
+        .mono { font-family: 'Space Mono', monospace; }
+
+        /* Map Grid Background */
+        .map-container {
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+            background-color: #020617;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        /* Radar Pulse Animation */
+        .radar-pulse {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+
+        /* FEATURE 1: Signal Waveform Animation */
+        .signal-bar { animation: wave 1.5s ease-in-out infinite; transform-origin: bottom; }
+        @keyframes wave { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+
+        /* Drone View Overlay */
+        .drone-overlay {
+            background: linear-gradient(rgba(15, 23, 42, 0.8), transparent);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scanning Line */
+        .scan-line {
+            height: 2px;
+            width: 100%;
+            background: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 15px var(--neon-blue);
+            position: absolute;
+            animation: scan 4s linear infinite;
+            z-index: 10;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Glass HUD */
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* FEATURE 2: Heatmap Simulation */
+        .heat-zone {
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            width: 300px;
+            height: 300px;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar for sidebars */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <div id="sarToast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[200] animate__animated animate__fadeInDown">
+        <div class="bg-blue-600/90 backdrop-blur-md px-6 py-3 rounded-full border border-blue-400 flex items-center gap-4 shadow-2xl">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-white">New Search Initiated: Sector 7G</span>
+        </div>
+    </div>
+
+    <nav class="h-20 flex items-center justify-between px-6 border-b border-white/10 z-50 hud-panel">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center animate-pulse">
+                <i class="ph-fill ph-satellite-reception text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-black text-sm tracking-widest uppercase">Global_Live_Feed</h1>
+                <p class="text-[10px] text-blue-400 font-bold mono uppercase">Sat_ID: CRITTER-09X // Lat: <span id="lat-val">6.5244</span> N</p>
+            </div>
+        </div>
+        
+        <div class="hidden xl:flex flex-1 mx-12 overflow-hidden items-center whitespace-nowrap mask-fade-edges">
+            <div class="animate-marquee flex gap-12 text-[10px] mono text-slate-500 font-bold">
+                <span>[TARGET_01: 6.524N, 3.379E]</span>
+                <span>[TARGET_02: 40.712N, 74.006W]</span>
+                <span>[TARGET_03: 34.052N, 118.243W]</span>
+                <span>[TARGET_01: 6.524N, 3.379E]</span>
+            </div>
+        </div>
+        
+        <div class="hidden lg:flex gap-8 items-center">
+            <div class="text-right">
+                <div class="text-[10px] text-slate-500 font-black uppercase">Active Nodes</div>
+                <div class="text-xs font-bold mono">4,209 ONLINE</div>
+            </div>
+            <div class="h-8 w-[1px] bg-white/10"></div>
+            <a href="how-it-works.html" class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Protocol_Home</a>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex relative overflow-hidden">
+        
+        <aside class="w-80 border-r border-white/10 p-6 hidden xl:flex flex-col z-40 hud-panel">
+            <div class="mb-8 shrink-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest">Active Cases</h3>
+                    <i class="ph ph-funnel text-slate-500"></i>
+                </div>
+                <div class="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
+                    <div class="p-4 bg-blue-600/10 border border-blue-500/30 rounded-2xl group hover:bg-blue-600/20 transition-all cursor-pointer">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-black bg-blue-600 px-2 py-0.5 rounded">PET_RECOVERY</span>
+                            <span class="text-[10px] mono text-blue-400 animate-pulse">LIVE TRACK</span>
+                        </div>
+                        <h4 class="font-black text-sm mb-1">Golden Retriever "Buddy"</h4>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-2"><i class="ph ph-map-pin"></i> Ikeja, Lagos Region</p>
+                    </div>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-2xl group hover:border-white/30 transition-all cursor-pointer">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-black bg-slate-700 px-2 py-0.5 rounded">ASSET_ITEM</span>
+                            <span class="text-[10px] mono text-slate-500">STATIONARY</span>
+                        </div>
+                        <h4 class="font-black text-sm mb-1">Nano-Leather Wallet</h4>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-2"><i class="ph ph-map-pin"></i> Downtown Sector 4</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-6 border-t border-white/10">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Environment_Intel</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div class="text-[9px] text-slate-400 uppercase font-black">Visibility</div>
+                        <div class="text-xs font-bold">Excellent</div>
+                    </div>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div class="text-[9px] text-slate-400 uppercase font-black">Wind SPD</div>
+                        <div class="text-xs font-bold">12 km/h</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative map-container overflow-hidden">
+            <div class="heat-zone top-1/4 left-1/3"></div>
+
+            <div class="absolute top-6 left-6 z-50 flex flex-col gap-2">
+                <button class="bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center shadow-lg"><i class="ph ph-layers-fill"></i></button>
+                <div class="glass-panel p-2 rounded-xl flex flex-col gap-2 opacity-0 hover:opacity-100 transition-opacity">
+                    <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-blue-600 text-[10px] font-black">SAT</button>
+                    <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-blue-600 text-[10px] font-black">THR</button>
+                    <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-blue-600 text-[10px] font-black">DRN</button>
+                </div>
+            </div>
+
+            <div class="absolute inset-0">
+                <div class="absolute top-[30%] left-[40%] group">
+                    <div class="radar-pulse"></div>
+                    <div class="relative z-10 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-[0_0_15px_#3b82f6]"></div>
+                    <div class="absolute top-6 left-6 hud-panel p-4 rounded-2xl w-48 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 pointer-events-none z-[60]">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-black text-blue-400">ID: B-772</span>
+                            <span class="text-[9px] font-bold text-emerald-400">ACTIVE</span>
+                        </div>
+                        <p class="text-[11px] font-bold">Confidence: 94.2%</p>
+                        <p class="text-[11px] text-slate-400">Biological lock confirmed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 right-6 w-full max-w-[280px] md:max-w-md aspect-video rounded-[2.5rem] overflow-hidden border-2 border-white/20 shadow-2xl z-40 group">
+                <div class="scan-line"></div>
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 transition-all duration-1000">
+                
+                <div class="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <div class="bg-red-600 px-3 py-1 rounded text-[10px] font-black animate-pulse uppercase">Live_Recon_v04</div>
+                            <div class="text-[9px] font-black mono text-emerald-400"><i class="ph ph-battery-high"></i> 88% REMAINING</div>
+                        </div>
+                        <div class="text-right text-[10px] font-bold mono">
+                            ALT: 120.4M<br>
+                            GPS: 6.524, 3.379
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="w-16 h-16 border-l-2 border-b-2 border-white/30"></div>
+                        <div class="text-[10px] font-black tracking-tighter uppercase text-center bg-black/40 px-3 py-1 rounded-full">Rec_Buffer: Active</div>
+                        <div class="w-16 h-16 border-r-2 border-b-2 border-white/30"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-40 p-2 bg-slate-900/50 backdrop-blur-lg rounded-[2rem] border border-white/10">
+                <button class="w-12 h-12 rounded-full hud-panel flex items-center justify-center hover:bg-blue-600 transition-all"><i class="ph ph-plus"></i></button>
+                <button class="w-12 h-12 rounded-full hud-panel flex items-center justify-center hover:bg-blue-600 transition-all"><i class="ph ph-minus"></i></button>
+                <button class="px-6 rounded-full bg-blue-600 flex items-center gap-3 font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/40">
+                    <i class="ph-fill ph-navigation-arrow"></i> Recenter
+                </button>
+                <button class="w-12 h-12 rounded-full hud-panel flex items-center justify-center hover:bg-red-600 transition-all"><i class="ph ph-warning"></i></button>
+            </div>
+        </main>
+
+        <aside class="w-80 border-l border-white/10 p-6 hidden 2xl:flex flex-col z-40 hud-panel overflow-y-auto">
+            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Signal Analytics</h3>
+            
+            <div class="space-y-8">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <div class="flex justify-between text-[10px] font-black uppercase mb-4">
+                        <span>Signal Stability</span>
+                        <span class="text-blue-400">v.09</span>
+                    </div>
+                    <div class="flex items-end gap-1 h-12">
+                        <div class="flex-1 bg-blue-600 signal-bar" style="animation-delay: 0.1s"></div>
+                        <div class="flex-1 bg-blue-600 signal-bar" style="animation-delay: 0.3s"></div>
+                        <div class="flex-1 bg-blue-600 signal-bar" style="animation-delay: 0.2s"></div>
+                        <div class="flex-1 bg-blue-400 signal-bar" style="animation-delay: 0.5s"></div>
+                        <div class="flex-1 bg-blue-600 signal-bar" style="animation-delay: 0.4s"></div>
+                        <div class="flex-1 bg-blue-600 signal-bar" style="animation-delay: 0.6s"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-[10px] font-black uppercase mb-2">
+                        <span>Current Sector Coverage</span>
+                        <span class="text-emerald-400">76%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full w-[76%] transition-all duration-1000"></div>
+                    </div>
+                </div>
+
+                <div class="p-6 border border-white/10 rounded-3xl bg-white/5 text-center group cursor-pointer hover:border-blue-500 transition-colors">
+                    <i class="ph ph-shield-check text-5xl text-blue-500 mb-4 block group-hover:scale-110 transition-transform"></i>
+                    <h4 class="text-xs font-black uppercase tracking-widest">Protocol Secured</h4>
+                    <p class="text-[10px] text-slate-500 mt-2 font-bold leading-relaxed">End-to-end encryption active via AES-512 neural relay nodes.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[100] hud-panel border-t border-white/10 px-6 py-4 flex justify-between items-center">
+        <button class="flex flex-col items-center gap-1 opacity-100 text-blue-500">
+            <i class="ph-fill ph-map-trifold text-xl"></i>
+            <span class="text-[8px] font-black uppercase">Map</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 opacity-50">
+            <i class="ph ph-list text-xl"></i>
+            <span class="text-[8px] font-black uppercase">Cases</span>
+        </button>
+        <button class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center -translate-y-8 shadow-xl shadow-blue-500/40 border-4 border-[#0f172a]">
+            <i class="ph-bold ph-magnifying-glass text-xl"></i>
+        </button>
+        <button class="flex flex-col items-center gap-1 opacity-50">
+            <i class="ph ph-chart-line text-xl"></i>
+            <span class="text-[8px] font-black uppercase">Stats</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 opacity-50">
+            <i class="ph ph-user text-xl"></i>
+            <span class="text-[8px] font-black uppercase">Profile</span>
+        </button>
+    </div>
+
+    <script>
+        // Update live coordinates
+        setInterval(() => {
+            const lat = (Math.random() * 0.001 + 6.5244).toFixed(4);
+            document.getElementById('lat-val').innerText = lat;
+        }, 2000);
+
+        // SAR Toast auto-hide
+        setTimeout(() => {
+            const toast = document.getElementById('sarToast');
+            toast.classList.replace('animate__fadeInDown', 'animate__fadeOutUp');
+        }, 6000);
+    </script>
+</body>
+</html>
