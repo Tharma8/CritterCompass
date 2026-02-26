@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Intel Dashboard | Recon Global</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root { --accent-blue: #007aff; --safety-green: #10b981; --clean-white: #ffffff; --soft-gray: #f9fafb; }
+        body { 
+            background: var(--soft-gray); 
+            color: #0f172a; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .mono { font-family: 'Space Mono', monospace; }
+
+        /* Professional Intel Card */
+        .intel-card {
+            background: var(--clean-white);
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .intel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent-blue);
+        }
+
+        /* Forensic Image Overlay */
+        .recon-view {
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+        .recon-view img {
+            transition: all 1s ease;
+            filter: grayscale(1) contrast(1.2) brightness(0.8);
+            opacity: 0.7;
+        }
+        .intel-card:hover .recon-view img {
+            filter: grayscale(0) contrast(1) brightness(1);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        /* Scanline Animation */
+        .scanline {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 122, 255, 0.5);
+            box-shadow: 0 0 10px #007aff;
+            z-index: 10;
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scan { 0% { top: 0% } 100% { top: 100% } }
+
+        /* Ticker */
+        .ticker-wrap { background: #0f172a; color: #fff; padding: 12px 0; overflow: hidden; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 100s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* Responsive Grid */
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        @media (max-width: 640px) { .masonry-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="pb-20">
+
+    <div class="ticker-wrap border-b border-white/5 mono text-[10px] font-bold uppercase tracking-[0.2em]">
+        <div class="ticker">
+            SIGNAL LOCK: #88219 SECURED IN LONDON • THERMAL FEED ACTIVE: SECTOR 7 • ASSET RECOVERY: ROLEX DAYTONA [MIAMI] • 100% VERIFIED DATA • UPLINK STABLE • ENCRYPTED NODE 09 ONLINE •
+        </div>
+    </div>
+
+    <nav class="sticky top-0 z-[1000] bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <i class="ph-fill ph-target"></i>
+                </div>
+                <span class="font-black tracking-tighter text-xl">RECON_INTEL</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
+                <a href="#live-grid" class="text-blue-600 border-b-2 border-blue-600 pb-1">Live Intel</a>
+                <a href="review.html" class="hover:text-blue-600 transition-all">Archived Cases</a>
+                <a href="satalite.html" class="hover:text-blue-600 transition-all">Global Map</a>
+            </div>
+            <a href="sms:+1234567890" class="bg-slate-900 text-white px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/20">
+                Start Trace
+            </a>
+        </div>
+    </nav>
+
+    <header class="max-w-7xl mx-auto px-6 pt-20 pb-12">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-10">
+            <div class="max-w-2xl space-y-6">
+                <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-full">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                    </span>
+                    <span class="text-[10px] font-black uppercase tracking-widest">System_Live: Active_Operations</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight text-slate-900 leading-[0.9]">Live Intel <br><span class="text-blue-600">Database.</span></h1>
+                <p class="text-lg text-slate-500 font-medium">Authentic, real-time recovery data from our global reconnaissance nodes. Each case is 100% verified and secured.</p>
+            </div>
+            
+            <div class="flex gap-10 border-l border-slate-200 pl-10 hidden lg:flex">
+                <div class="text-center">
+                    <div class="text-5xl font-black text-slate-900 italic">80</div>
+                    <div class="text-[9px] font-bold uppercase text-slate-400 mt-2">Verified_Clients</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-black text-blue-600 italic">14ms</div>
+                    <div class="text-[9px] font-bold uppercase text-slate-400 mt-2">Avg_Latency</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 flex flex-wrap gap-4">
+            <div class="relative flex-1 min-w-[300px]">
+                <i class="ph ph-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                <input type="text" id="intelSearch" placeholder="Filter by target, location, or asset type..." 
+                    class="w-full pl-14 pr-6 py-5 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-sm shadow-sm">
+            </div>
+            <button class="px-8 py-5 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">
+                <i class="ph-bold ph-faders"></i> Adjust_Parameters
+            </button>
+        </div>
+    </header>
+
+    <main id="live-grid" class="max-w-7xl mx-auto px-6 py-10">
+        <div id="masterGrid" class="masonry-grid">
+            </div>
+    </main>
+
+    <div class="fixed bottom-8 right-8 z-[500] flex flex-col items-end gap-4">
+        <div class="animate__animated animate__fadeInRight bg-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-100 flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Recon_Unit: Online</span>
+        </div>
+        <a href="sms:+1234567890&body=RECON_RECOVERY_REQUEST: " class="w-20 h-20 bg-blue-600 rounded-[2.5rem] flex items-center justify-center text-white text-3xl shadow-2xl hover:scale-110 active:scale-95 transition-all">
+            <i class="ph-fill ph-chat-circle-dots"></i>
+        </a>
+    </div>
+
+    <script>
+        // COMPREHENSIVE RECON DATABASE
+        const reconDatabase = [
+            { target: "Rolex Submariner", loc: "London, UK", status: "SECURED", type: "LUXURY_ASSET", msg: "Traced to a private residence within 4 hours. Asset retrieved by local team.", lat: "51.50", long: "0.12", client: "Mark R." },
+            { target: "French Bulldog", loc: "Miami, USA", status: "LOCATED", type: "PET_RECOVERY", msg: "Thermal drone ping detected heat signature in Sector 4 woods. Reunited.", lat: "25.76", long: "-80.19", client: "Sarah J." },
+            { target: "MacBook Pro M3", loc: "Tokyo, JP", status: "TRACING", type: "TECH_INTEL", msg: "IP address backtracked to Shibuya district. Visual lock in progress.", lat: "35.67", long: "139.65", client: "Kenji W." },
+            { target: "Custom G-Wagon", loc: "Dubai, UAE", status: "SECURED", type: "VEHICLE_RECON", msg: "GPS jammer bypassed. Signal restored. Asset locked at Dubai Port.", lat: "25.20", long: "55.27", client: "Ahmed A." },
+            { target: "Antique Heirloom", loc: "Paris, FR", status: "RECOVERED", type: "VALUABLES", msg: "Listing found on private darknet auction. Intelligence provided to authorities.", lat: "48.85", long: "2.35", client: "Elena B." },
+            { target: "Lost Wallet (Crypto)", loc: "Berlin, DE", status: "EXTRACTED", type: "DATA_RECOVERY", msg: "Encrypted seed phrase reconstructed from damaged hardware drive.", lat: "52.52", long: "13.40", client: "Hans G." }
+        ];
+
+        const grid = document.getElementById('masterGrid');
+
+        // GENERATE 80 UNIQUE INTEL NODES
+        for (let i = 0; i < 80; i++) {
+            const data = reconDatabase[i % reconDatabase.length];
+            const delay = (i % 10) * 0.05;
+            const isSecured = data.status === "SECURED" || data.status === "RECOVERED";
+            
+            const card = document.createElement('div');
+            card.className = "intel-card rounded-[2.5rem] overflow-hidden flex flex-col animate__animated animate__fadeInUp";
+            card.style.animationDelay = `${delay}s`;
+
+            card.innerHTML = `
+                <div class="recon-view h-64">
+                    <div class="scanline"></div>
+                    <img src="https://picsum.photos/seed/recon${i}/600/500" class="w-full h-full object-cover" loading="lazy">
+                    
+                    <div class="absolute top-6 left-6 flex flex-col gap-2 z-20">
+                        <div class="bg-black/80 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full ${isSecured ? 'bg-emerald-500' : 'bg-blue-500 animate-pulse'}"></span>
+                            <span class="text-[8px] font-black mono text-white uppercase">${data.status}</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-6 left-6 z-20">
+                        <div class="px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-lg border border-white/20">
+                            <span class="text-[9px] mono text-white font-bold">${data.lat}°N / ${data.long}°E</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 space-y-5 flex flex-col flex-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest">${data.type}</span>
+                        <div class="flex gap-1">
+                            ${'<i class="ph-fill ph-star text-yellow-400 text-[10px]"></i>'.repeat(5)}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900 leading-tight">Target: ${data.target}</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">${data.loc} // Sector_${200+i}</p>
+                    </div>
+
+                    <p class="text-sm font-medium text-slate-600 leading-relaxed italic">
+                        "${data.msg}"
+                    </p>
+
+                    <div class="flex items-center gap-1.5 pt-2">
+                        <div class="flex items-end gap-0.5 h-3">
+                            <div class="w-1 h-1 bg-blue-600"></div>
+                            <div class="w-1 h-2 bg-blue-600"></div>
+                            <div class="w-1 h-3 bg-blue-600"></div>
+                            <div class="w-1 h-2 bg-slate-200"></div>
+                        </div>
+                        <span class="text-[8px] font-black text-slate-400 mono">SIGNAL: 84.2%</span>
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="https://i.pravatar.cc/100?u=client${i}" class="w-10 h-10 rounded-xl object-cover ring-4 ring-slate-50">
+                            <div>
+                                <h4 class="text-xs font-black text-slate-900">${data.client}</h4>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase">Verified_Client</p>
+                            </div>
+                        </div>
+                        <button class="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                            <i class="ph ph-share-network"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+
+        // LIVE SEARCH LOGIC
+        document.getElementById('intelSearch').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.intel-card').forEach(card => {
+                const content = card.innerText.toLowerCase();
+                card.style.display = content.includes(term) ? 'flex' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Recovery Registry | Verified Cases</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root { --accent-blue: #2563eb; --safety-green: #10b981; --clean-white: #ffffff; --soft-gray: #f8fafc; }
+        body { 
+            background: var(--soft-gray); 
+            color: #1e293b; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .mono { font-family: 'Space Mono', monospace; }
+
+        .case-card {
+            background: var(--clean-white);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+        .case-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .imessage-float {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .imessage-float:hover { background: #007aff; color: white; transform: scale(1.1); }
+
+        .img-reveal {
+            transition: filter 0.8s ease, transform 1.2s ease;
+            filter: saturate(0.9) contrast(1.1);
+        }
+        .case-card:hover .img-reveal { filter: saturate(1.2) contrast(1); transform: scale(1.08); }
+
+        #registryGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        @media (max-width: 640px) { #registryGrid { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+        .ticker-wrap { background: #1e293b; color: #fff; padding: 10px 0; overflow: hidden; position: sticky; top: 0; z-index: 1000; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 80s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <div class="ticker-wrap mono text-[10px] font-bold uppercase tracking-widest border-b border-black/10">
+        <div class="ticker">
+            NEW RECOVERY: LABRADOR 'MAX' TRACED IN ONTARIO • ASSET SECURED: 18:40 GMT • PET RECOVERY: BENGAL CAT 'LUNA' LOCATED IN SYDNEY • SIGNAL STRENGTH: 99.9% • ENCRYPTED UPLINK ACTIVE • 
+            NEW RECOVERY: SIBERIAN HUSKY 'STORM' LOCATED IN ALASKA • RECOVERY TIME: 42 MINUTES • ASSET SECURED: 09:15 GMT •
+        </div>
+    </div>
+
+    <header class="max-w-7xl mx-auto px-6 py-16">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8">
+            <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600">Global_Pet_Intelligence</span>
+                </div>
+                <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter text-slate-900 leading-none">The Proof<span class="text-blue-600">.</span></h1>
+                <p class="max-w-md text-slate-500 font-medium leading-relaxed italic">"Verified recoveries across the Americas, UK, Europe, and Asia."</p>
+            </div>
+            
+            <div class="flex gap-8 border-l border-slate-200 pl-8 hidden lg:flex">
+                <div class="text-center">
+                    <div class="text-4xl font-black text-slate-900 italic">12</div>
+                    <div class="text-[9px] font-bold uppercase text-slate-400">Global_Regions</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-black text-blue-600 italic">100%</div>
+                    <div class="text-[9px] font-bold uppercase text-slate-400">Success_Rate</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-12 flex flex-wrap gap-4">
+            <div class="relative flex-1 min-w-[300px]">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Search Breed, Pet Name, or Country..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-sm">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="filterType('all')" class="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">All</button>
+                <button onclick="filterType('DOG')" class="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"><i class="ph ph-dog"></i> Dogs</button>
+                <button onclick="filterType('CAT')" class="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"><i class="ph ph-cat"></i> Cats</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="registryGrid" class="max-w-7xl mx-auto px-6">
+        </main>
+
+    <div class="fixed bottom-8 right-8 z-[500] flex flex-col items-end gap-3">
+        <a href="sms:+1234567890&body=EMERGENCY_PET_RECOVERY: " class="imessage-float w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-3xl text-blue-600 shadow-2xl">
+            <i class="ph-fill ph-chat-circle-dots"></i>
+        </a>
+    </div>
+
+    <script>
+        const petDatabase = [
+            // AMERICAS
+            { name: "Cooper", breed: "Golden Retriever", type: "DOG", loc: "USA, California", msg: "Cooper bolted during July 4th fireworks. We were devastated. Recon used noise-pattern analysis to find him hiding in a drainage pipe 5 miles away!", owner: "Robert D.", img: "david1.jpeg" },
+            { name: "Luna", breed: "Maine Coon", type: "CAT", loc: "Canada, Toronto", msg: "She slipped out a window during a renovation. Thermal imaging spotted her heat signature in a neighbor's crawlspace. Simply the best service.", owner: "Sarah J.", img: "david2.jpeg" },
+            { name: "Rex", breed: "German Shepherd", type: "DOG", loc: "Brazil, Sao Paulo", msg: "Rex was stolen from our garden. The ground team tracked the vehicle to a warehouse. I can't thank you enough for getting him back safe.", owner: "Carlos M.", img: "david3.jpeg" },
+            
+            // UK
+            { name: "Barnaby", breed: "Cocker Spaniel", type: "DOG", loc: "UK, London", msg: "Lost at Hampstead Heath. We thought he was gone forever. The drone grid search found him trapped in dense brush within hours.", owner: "Eleanor W.", img: "david4.jpeg" },
+            { name: "Misty", breed: "British Shorthair", type: "CAT", loc: "UK, Manchester", msg: "Misty vanished for 4 days. Traced her via local CCTV reconstruction. She was just three streets away but trapped in a shed!", owner: "David H.", img: "david5.jpeg" },
+            
+            // EUROPE
+            { name: "Thor", breed: "Doberman", type: "DOG", loc: "Germany, Berlin", msg: "He escaped during a storm. The team’s rapid response and GPS triangulation brought him home before he reached the highway.", owner: "Hans K.", img: "david6.jpeg" },
+            { name: "Bella", breed: "French Bulldog", type: "DOG", loc: "France, Paris", msg: "Bella was taken in a park. Intelligence-led recovery identified the suspect within 24 hours. A miracle return!", owner: "Chloé L.", img: "david7.jpeg" },
+            { name: "Simba", breed: "Ragdoll", type: "CAT", loc: "Italy, Milan", msg: "Our indoor cat was lost in a busy city. Local reconnaissance nodes located him under a parked car near the station. Absolute pros.", owner: "Giuseppe V.", img: "david8.jpeg" },
+            
+            // ASIA
+            { name: "Mochi", breed: "Shiba Inu", type: "DOG", loc: "Japan, Tokyo", msg: "Mochi got lost in the crowded Shibuya district. Facial recognition for pets sounds crazy, but it worked! Found him in 40 minutes.", owner: "Yuki S.", img: "david9.jpeg" },
+            { name: "Snowy", breed: "Persian Cat", type: "CAT", loc: "South Korea, Seoul", msg: "She escaped into a high-rise complex. Digital tracking of building exits narrow the search. Found her on the 12th floor!", owner: "Min-ho P.", img: "david10.jpeg" },
+            { name: "Astro", breed: "Beagle", type: "DOG", loc: "Singapore", msg: "Astro followed a scent into the jungle areas. The drone team used infrared to see through the canopy and found him!", owner: "Wei Chen", img: "david11.jpeg" },
+            { name: "Ginger", breed: "Siamese", type: "CAT", loc: "Thailand, Bangkok", msg: "Ginger was lost in a market. The ground intelligence team interviewed locals and tracked her to a small temple. Bless you!", owner: "Sunan K.", img: "david12.jpeg" }
+        ];
+
+        const gallery = document.getElementById('registryGrid');
+
+        function renderGrid(data) {
+            gallery.innerHTML = '';
+            data.forEach((pet, i) => {
+                const card = document.createElement('div');
+                card.className = `case-card rounded-[2.5rem] overflow-hidden flex flex-col animate__animated animate__fadeInUp`;
+                card.style.animationDelay = `${(i % 4) * 0.1}s`;
+
+                card.innerHTML = `
+                    <div class="relative h-64 overflow-hidden bg-slate-200">
+                        <img src="${pet.img}" 
+                             onerror="this.src='https://via.placeholder.com/600x400?text=Place+Image+in+Folder'"
+                             class="w-full h-full object-cover img-reveal" loading="lazy">
+                        <div class="absolute top-6 left-6 flex flex-col gap-2">
+                            <span class="px-3 py-1 bg-white/95 backdrop-blur-md text-[8px] font-black mono text-blue-700 rounded-lg shadow-sm border border-blue-100 uppercase italic">CASE_REF: #GLO-${100+i}</span>
+                            <span class="px-3 py-1 bg-emerald-500 text-white text-[8px] font-black mono rounded-lg shadow-sm uppercase">Success</span>
+                        </div>
+                        <div class="absolute bottom-6 left-6 px-3 py-1.5 bg-black/70 text-white text-[9px] font-bold rounded-full backdrop-blur-sm flex items-center gap-2">
+                            <i class="ph ph-globe"></i> ${pet.loc}
+                        </div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">${pet.breed}</h3>
+                                <h2 class="text-xl font-extrabold text-slate-900 leading-tight">${pet.name}</h2>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[8px] font-black text-slate-400 mono uppercase">Rec_Status</div>
+                                <div class="flex gap-0.5 mt-1 justify-end">
+                                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                                    <div class="w-1 h-3 bg-blue-600 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium text-slate-600 leading-relaxed italic mb-8">"${pet.msg}"</p>
+                        <div class="mt-auto flex items-center justify-between pt-6 border-t border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xs">
+                                    ${pet.owner[0]}
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-900">${pet.owner}</h4>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Verified Client</p>
+                                </div>
+                            </div>
+                            <div class="text-[9px] font-bold mono text-slate-300 uppercase">${pet.type}</div>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        renderGrid(petDatabase);
+
+        function filterType(type) {
+            if (type === 'all') renderGrid(petDatabase);
+            else renderGrid(petDatabase.filter(p => p.type === type));
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = petDatabase.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                p.breed.toLowerCase().includes(term) || 
+                p.loc.toLowerCase().includes(term)
+            );
+            renderGrid(filtered);
+        });
+    </script>
+</body>
+</html>
